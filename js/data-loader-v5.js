@@ -532,8 +532,7 @@ function getLojaStats() {
             verde: 0,
             laranja: 0,
             vermelho: 0,
-            cinza: 0,
-            roxa: 0
+            cinza: 0
         },
         porRegiao: {},
         porRede: {},

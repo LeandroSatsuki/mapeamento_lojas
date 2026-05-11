@@ -13,9 +13,9 @@
     "attribution": "&copy; OpenStreetMap contributors"
   },
   "googleSheets": {
-    "spreadsheetId": "1Yh3cPEEvcM5P9YQIiEyoqch3SCH-RU09",
-    "csvUrl": "https://docs.google.com/spreadsheets/d/1Yh3cPEEvcM5P9YQIiEyoqch3SCH-RU09/export?format=csv&gid=1544229708",
-    "jsonUrl": "https://docs.google.com/spreadsheets/d/1Yh3cPEEvcM5P9YQIiEyoqch3SCH-RU09/export?format=json&gid=1544229708",
+    "spreadsheetId": "1fBy0WEDHpmPpHxI4mVhqg7ABdTb4W0SJDH4vJyTd_sY",
+    "csvUrl": "https://docs.google.com/spreadsheets/d/1fBy0WEDHpmPpHxI4mVhqg7ABdTb4W0SJDH4vJyTd_sY/export?format=csv&gid=0",
+    "jsonUrl": "https://docs.google.com/spreadsheets/d/1fBy0WEDHpmPpHxI4mVhqg7ABdTb4W0SJDH4vJyTd_sY/export?format=json&gid=0",
     "updateInterval": 300000,
     "useTestData": false
   },
@@ -23,26 +23,26 @@
     "verde": {
       "hex": "#228B22",
       "rgb": "34, 139, 34",
-      "label": "Faturamento Recente",
-      "status": "RECENTE"
+      "label": "Roteirizado (Atendido)",
+      "status": "ROTEIRIZADO_ATENDIDO"
     },
     "laranja": {
       "hex": "#FF8C00",
       "rgb": "255, 140, 0",
-      "label": "Faturamento Intermediário",
-      "status": "INTERMEDIARIO"
+      "label": "Não Roteirizado (Com Venda)",
+      "status": "NAO_ROTEIRIZADO_COM_VENDA"
     },
     "vermelho": {
       "hex": "#DC143C",
       "rgb": "220, 20, 60",
-      "label": "Sem Faturamento",
-      "status": "ANTIGO"
+      "label": "Roteirizado (Sem Venda)",
+      "status": "ROTEIRIZADO_SEM_VENDA"
     },
     "cinza": {
-      "hex": "#808080",
-      "rgb": "128, 128, 128",
-      "label": "Status Desconhecido",
-      "status": "NUNCA"
+      "hex": "#4B5563",
+      "rgb": "75, 85, 99",
+      "label": "Não Roteirizado (Sem Venda)",
+      "status": "NAO_ROTEIRIZADO_SEM_VENDA"
     }
   },
   "logos": {

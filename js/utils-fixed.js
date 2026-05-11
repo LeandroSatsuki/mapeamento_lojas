@@ -250,8 +250,7 @@ function getColorByStatus(status) {
         'verde': '#228B22',
         'laranja': '#FF8C00',
         'vermelho': '#DC143C',
-        'cinza': '#808080',
-        'roxa': '#7C3AED'
+        'cinza': '#4B5563',
     };
 
     return colors[status.toLowerCase()] || colors['cinza'];
@@ -292,32 +291,38 @@ function normalizeStatus(status) {
     log(`Status original: "${status}" → Normalizado: "${normalized}"`, 'log');
 
     // Verificar cada tipo de status
-    console.log('8. Testando ROXA/ROXO/TERCEIROS:', normalized.includes('roxa') || normalized.includes('roxo') || normalized.includes('rox') || normalized.includes('terceir'));
-    if (normalized.includes('roxa') || normalized.includes('roxo') || normalized.includes('rox') || normalized.includes('terceir')) {
-        console.log('✓ ROXA encontrado!');
-        log('Status identificado como: ROXA', 'log');
-        return 'roxa';
-    }
+    const isRoteirizado = normalized.includes('roteirizado') || normalized.includes('roterizado');
+    const isNaoRoteirizado = normalized.includes('não roteirizado') || normalized.includes('nao roteirizado');
+    const hasAtendido = normalized.includes('atendido');
+    const hasSemVenda = normalized.includes('sem venda');
+    const hasComVenda = normalized.includes('com venda');
 
-    console.log('9. Testando VERDE:', normalized.includes('verde'));
-    if (normalized.includes('verde')) {
+    console.log('8. Testando VERDE:', (isRoteirizado && hasAtendido) || normalized.includes('verde'));
+    if ((isRoteirizado && hasAtendido) || normalized.includes('verde')) {
         console.log('✓ VERDE encontrado!');
         log('Status identificado como: VERDE', 'log');
         return 'verde';
     }
     
-    console.log('10. Testando LARANJA:', normalized.includes('laranja'));
-    if (normalized.includes('laranja')) {
+    console.log('9. Testando VERMELHO:', (isRoteirizado && hasSemVenda) || normalized.includes('vermelho'));
+    if ((isRoteirizado && hasSemVenda) || normalized.includes('vermelho') || normalized.includes('antigo')) {
+        console.log('✓ VERMELHO encontrado!');
+        log('Status identificado como: VERMELHO', 'log');
+        return 'vermelho';
+    }
+
+    console.log('10. Testando LARANJA:', (isNaoRoteirizado && hasComVenda) || normalized.includes('laranja'));
+    if ((isNaoRoteirizado && hasComVenda) || normalized.includes('laranja')) {
         console.log('✓ LARANJA encontrado!');
         log('Status identificado como: LARANJA', 'log');
         return 'laranja';
     }
     
-    console.log('11. Testando VERMELHO:', normalized.includes('vermelho'));
-    if (normalized.includes('vermelho') || normalized.includes('antigo')) {
-        console.log('✓ VERMELHO encontrado!');
-        log('Status identificado como: VERMELHO', 'log');
-        return 'vermelho';
+    console.log('11. Testando CINZA:', (isNaoRoteirizado && hasSemVenda) || normalized.includes('cinza'));
+    if ((isNaoRoteirizado && hasSemVenda) || normalized.includes('cinza') || normalized.includes('nunca')) {
+        console.log('✓ CINZA encontrado!');
+        log('Status identificado como: CINZA', 'log');
+        return 'cinza';
     }
 
     console.log('11. Nenhum match encontrado! Retornando CINZA');
@@ -614,11 +619,10 @@ function log(message, type = 'log') {
  */
 function getStatusLabel(status) {
     const labels = {
-        'verde': 'Faturamento Recente',
-        'laranja': 'Faturamento Intermediário',
-        'vermelho': 'Sem Faturamento',
-        'cinza': 'Status Desconhecido',
-        'roxa': 'Roxa Atendidas Por Terceiros'
+        'verde': 'Roteirizado (Atendido)',
+        'laranja': 'Não Roteirizado (Com Venda)',
+        'vermelho': 'Roteirizado (Sem Venda)',
+        'cinza': 'Não Roteirizado (Sem Venda)',
     };
 
     return labels[status] || 'Desconhecido';

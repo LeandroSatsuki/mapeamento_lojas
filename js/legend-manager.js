@@ -9,8 +9,7 @@ let legendState = {
     verde: true,
     laranja: true,
     vermelho: true,
-    cinza: true,
-    roxa: true
+    cinza: true
 };
 
 // Controle global de status visíveis da legenda para uso em plugins externos (ex: Busca)
@@ -18,8 +17,7 @@ window.activeLegendStatus = {
     'verde': true,
     'laranja': true,
     'vermelho': true,
-    'cinza': true,
-    'roxa': true
+    'cinza': true
 };
 
 /**
@@ -35,6 +33,10 @@ function initializeLegend() {
     // Adicionar event listeners aos itens da legenda
     const legendItems = legend.querySelectorAll('.legend-item');
     legendItems.forEach(item => {
+        const label = item.querySelector('.legend-label');
+        if (label && !label.dataset.baseLabel) {
+            label.dataset.baseLabel = label.textContent.trim();
+        }
         item.style.cursor = 'pointer';
         item.addEventListener('click', function () {
             onLegendItemClick(this);
@@ -53,16 +55,14 @@ function onLegendItemClick(element) {
     const label = element.querySelector('.legend-label').textContent;
     let status = '';
 
-    if (label.includes('Atendimento < 30 Dias')) {
+    if (label.includes('Roteirizado (Atendido)')) {
         status = 'verde';
-    } else if (label.includes('Atendimento 30 a 45 dias')) {
+    } else if (label.includes('Não Roteirizado (Com Venda)')) {
         status = 'laranja';
-    } else if (label.includes('Atendimento > 45 Dias')) {
+    } else if (label.includes('Roteirizado (Sem Venda)')) {
         status = 'vermelho';
-    } else if (label.includes('Oportunidades')) {
+    } else if (label.includes('Não Roteirizado (Sem Venda)')) {
         status = 'cinza';
-    } else if (label.includes('Atendidas Por Terceiro') || label.toLowerCase().includes('terceiro')) {
-        status = 'roxa';
     }
 
     if (status) {
@@ -84,10 +84,10 @@ function toggleLegendStatus(status, element = null) {
         const items = legend.querySelectorAll('.legend-item');
         items.forEach(item => {
             const label = item.querySelector('.legend-label').textContent;
-            if ((status === 'verde' && label.includes('Atendimento < 30 Dias')) ||
-                (status === 'laranja' && label.includes('Atendimento 30 a 45 dias')) ||
-                (status === 'vermelho' && label.includes('Atendimento > 45 Dias')) ||
-                (status === 'cinza' && label.includes('Oportunidades'))) {
+            if ((status === 'verde' && label.includes('Roteirizado (Atendido)')) ||
+                (status === 'laranja' && label.includes('Não Roteirizado (Com Venda)')) ||
+                (status === 'vermelho' && label.includes('Roteirizado (Sem Venda)')) ||
+                (status === 'cinza' && label.includes('Não Roteirizado (Sem Venda)'))) {
                 element = item;
             }
         });
@@ -117,7 +117,6 @@ function updateLegendFilter() {
     if (legendState.laranja) activeStatuses.push('laranja');
     if (legendState.vermelho) activeStatuses.push('vermelho');
     if (legendState.cinza) activeStatuses.push('cinza');
-    if (legendState.roxa) activeStatuses.push('roxa');
 
     // Esse estado compartilhado permite que busca rapida e filtros
     // textuais enxerguem exatamente os status visiveis no painel.
@@ -136,7 +135,6 @@ function activateAllLegendStatus() {
     legendState.laranja = true;
     legendState.vermelho = true;
     legendState.cinza = true;
-    legendState.roxa = true;
 
     updateLegendVisuals();
     updateLegendFilter();
@@ -152,7 +150,6 @@ function deactivateAllLegendStatus() {
     legendState.laranja = false;
     legendState.vermelho = false;
     legendState.cinza = false;
-    legendState.roxa = false;
 
     updateLegendVisuals();
     updateLegendFilter();
@@ -172,16 +169,14 @@ function updateLegendVisuals() {
         const label = item.querySelector('.legend-label').textContent;
         let status = '';
 
-        if (label.includes('Atendimento < 30 Dias')) {
+        if (label.includes('Roteirizado (Atendido)')) {
             status = 'verde';
-        } else if (label.includes('Atendimento 30 a 45 dias')) {
+        } else if (label.includes('Não Roteirizado (Com Venda)')) {
             status = 'laranja';
-        } else if (label.includes('Atendimento > 45 Dias')) {
+        } else if (label.includes('Roteirizado (Sem Venda)')) {
             status = 'vermelho';
-        } else if (label.includes('Oportunidades')) {
+        } else if (label.includes('Não Roteirizado (Sem Venda)')) {
             status = 'cinza';
-        } else if (label.includes('Atendidas Por Terceiro') || label.toLowerCase().includes('terceiro')) {
-            status = 'roxa';
         }
 
         if (status) {
@@ -228,13 +223,11 @@ function addLegendControls() {
  */
 function getLegendTooltip(status) {
     const tooltips = {
-        'verde': 'Clique para mostrar/ocultar lojas com Atendimento < 30 Dias',
-        'laranja': 'Clique para mostrar/ocultar lojas com Atendimento 30 a 45 dias',
-        'vermelho': 'Clique para mostrar/ocultar lojas com Atendimento > 45 Dias',
-        'cinza': 'Clique para mostrar/ocultar oportunidades'
+        'verde': 'Clique para mostrar/ocultar lojas roteirizadas e atendidas',
+        'laranja': 'Clique para mostrar/ocultar lojas não roteirizadas com venda',
+        'vermelho': 'Clique para mostrar/ocultar lojas roteirizadas sem venda',
+        'cinza': 'Clique para mostrar/ocultar lojas não roteirizadas sem venda'
     };
-
-    tooltips.roxa = 'Clique para mostrar/ocultar lojas atendidas por terceiro';
 
     return tooltips[status] || '';
 }
@@ -262,26 +255,23 @@ function updateLegendCounts() {
         let status = '';
         let count = 0;
 
-        if (label.textContent.includes('Atendimento < 30 Dias')) {
+        if (label.textContent.includes('Roteirizado (Atendido)')) {
             status = 'verde';
             count = stats.porStatus.verde;
-        } else if (label.textContent.includes('Atendimento 30 a 45 dias')) {
+        } else if (label.textContent.includes('Não Roteirizado (Com Venda)')) {
             status = 'laranja';
             count = stats.porStatus.laranja;
-        } else if (label.textContent.includes('Atendimento > 45 Dias')) {
+        } else if (label.textContent.includes('Roteirizado (Sem Venda)')) {
             status = 'vermelho';
             count = stats.porStatus.vermelho;
-        } else if (label.textContent.includes('Oportunidades')) {
+        } else if (label.textContent.includes('Não Roteirizado (Sem Venda)')) {
             status = 'cinza';
             count = stats.porStatus.cinza;
-        } else if (label.textContent.includes('Atendidas Por Terceiro') || label.textContent.toLowerCase().includes('terceiro')) {
-            status = 'roxa';
-            count = stats.porStatus.roxa || 0;
         }
 
         if (status) {
             // Adicionar contador ao label
-            let labelText = label.textContent.split(' (')[0]; // Remove contador anterior
+            const labelText = label.dataset.baseLabel || label.textContent.trim();
             label.textContent = `${labelText} (${count})`;
             label.title = getLegendTooltip(status);
         }

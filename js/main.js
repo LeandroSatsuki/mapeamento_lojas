@@ -278,10 +278,10 @@ function showStatistics() {
 Total de Lojas: ${stats.total}
 
 Por Status:
-- Verde (Recente): ${stats.porStatus.verde}
-- Laranja (Intermediário): ${stats.porStatus.laranja}
-- Vermelho (Antigo): ${stats.porStatus.vermelho}
-- Cinza (Desconhecido): ${stats.porStatus.cinza}
+- Verde (Roteirizado / Atendido): ${stats.porStatus.verde}
+- Laranja (Não Roteirizado / Com Venda): ${stats.porStatus.laranja}
+- Vermelho (Roteirizado / Sem Venda): ${stats.porStatus.vermelho}
+- Cinza Escuro (Não Roteirizado / Sem Venda): ${stats.porStatus.cinza}
 
 Redes Cadastradas: ${Object.keys(stats.porRede).length}
 Regiões: ${Object.keys(stats.porRegiao).length}

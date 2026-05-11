@@ -80,11 +80,10 @@ function getLogoPath(rede) {
 
 function getColorByStatus(status) {
     const s = (status || '').toLowerCase().trim();
-    if (s.includes('roxa') || s.includes('terceiro')) return '#7C3AED';
     if (s.includes('verde')) return '#22c55e';
     if (s.includes('laranja')) return '#f97316';
     if (s.includes('vermelho')) return '#ef4444';
-    return '#9ca3af';
+    return '#4b5563';
 }
 
 function addMarkersToMap(lojas) {
