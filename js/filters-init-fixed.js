@@ -1,9 +1,8 @@
 /**
  * ============================================
- * INICIALIZAÇÃO DE FILTROS (CORRIGIDO)
+ * INICIALIZACAO DE FILTROS
  * ============================================
- * Inicializa e configura o painel de filtros
- * VERSÃO CORRIGIDA: Painel funciona corretamente
+ * Inicializa o painel lateral e atualiza opcoes dependentes.
  */
 
 /**
@@ -13,58 +12,12 @@ function initializeFilters() {
     try {
         log('Inicializando filtros...', 'log');
 
-        // Criar checkboxes de regiões
-        const regioesContainer = document.getElementById('filterRegioesContainer');
-        if (regioesContainer) {
-            const regioes = getUniqueRegions();
-            let html = '<strong>Região:</strong><br>';
-            regioes.forEach(regiao => {
-                html += `
-                    <label class="filter-checkbox">
-                        <input type="checkbox" data-filter-regiao="${regiao}">
-                        <span>${regiao}</span>
-                    </label>
-                `;
-            });
-            regioesContainer.innerHTML = html;
-            // Attach listeners (avoid inline onchange to prevent conflicts)
-            regioesContainer.querySelectorAll('input[data-filter-regiao]').forEach(inp => {
-                inp.addEventListener('change', function() {
-                    const r = this.dataset.filterRegiao;
-                    setRegiaoFilter(r, this.checked);
-                    applyFilters();
-                });
-            });
-            log(`${regioes.length} regiões carregadas`, 'log');
-        }
+        renderUFFilters();
+        renderRegionFilters();
 
-        // Criar checkboxes de UFs
-        const ufsContainer = document.getElementById('filterUFsContainer');
-        if (ufsContainer) {
-            const ufs = getUniqueUFs();
-            let html = '<strong>Estado:</strong><br>';
-            ufs.forEach(uf => {
-                html += `
-                    <label class="filter-checkbox">
-                        <input type="checkbox" data-filter-uf="${uf}">
-                        <span>${uf}</span>
-                    </label>
-                `;
-            });
-            ufsContainer.innerHTML = html;
-            ufsContainer.querySelectorAll('input[data-filter-uf]').forEach(inp => {
-                inp.addEventListener('change', function() {
-                    const u = this.dataset.filterUf;
-                    setUFFilter(u, this.checked);
-                    applyFilters();
-                });
-            });
-            log(`${ufs.length} estados carregados`, 'log');
-        }
-
-        // Criar checkboxes de redes
+        // Criar checkboxes de redes se o container existir
         const redesContainer = document.getElementById('filterRedesContainer');
-        if (redesContainer) {
+        if (redesContainer && typeof getUniqueNetworks === 'function') {
             const redes = getUniqueNetworks();
             let html = '';
             redes.forEach(rede => {
@@ -77,7 +30,7 @@ function initializeFilters() {
             });
             redesContainer.innerHTML = html;
             redesContainer.querySelectorAll('input[data-filter-rede]').forEach(inp => {
-                inp.addEventListener('change', function() {
+                inp.addEventListener('change', function () {
                     const r = this.dataset.filterRede;
                     setRedeFilter(r, this.checked);
                     applyFilters();
@@ -86,10 +39,7 @@ function initializeFilters() {
             log(`${redes.length} redes carregadas`, 'log');
         }
 
-        // Adicionar event listeners aos inputs de texto
         setupTextFilterListeners();
-
-        // Adicionar event listeners dos botões
         setupButtonListeners();
 
         log('Filtros inicializados com sucesso', 'log');
@@ -98,49 +48,145 @@ function initializeFilters() {
     }
 }
 
+function renderUFFilters() {
+    const ufsContainer = document.getElementById('filterUFsContainer');
+    if (!ufsContainer) return;
+
+    const ufs = getUniqueUFs();
+    let html = '';
+    ufs.forEach(uf => {
+        const checked = activeFilters.uf.includes(uf) ? 'checked' : '';
+        html += `
+            <label class="filter-checkbox">
+                <input type="checkbox" data-filter-uf="${uf}" ${checked}>
+                <span>${uf}</span>
+            </label>
+        `;
+    });
+
+    ufsContainer.innerHTML = html;
+    ufsContainer.querySelectorAll('input[data-filter-uf]').forEach(inp => {
+        inp.addEventListener('change', function () {
+            const uf = this.dataset.filterUf;
+            setUFFilter(uf, this.checked);
+            renderRegionFilters();
+            applyFilters();
+        });
+    });
+
+    log(`${ufs.length} estados carregados`, 'log');
+}
+
+function getUniqueUFs() {
+    const lojas = getLojas() || [];
+    return [...new Set(
+        lojas
+            .map(loja => (loja.uf || '').toString().trim().toUpperCase())
+            .filter(Boolean)
+    )].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+}
+
+function getRegionsByUFs(selectedUFs = []) {
+    const lojas = getLojas() || [];
+    const normalizedUFs = selectedUFs.map(uf => (uf || '').toString().trim().toUpperCase());
+
+    return [...new Set(
+        lojas
+            .filter(loja => normalizedUFs.includes((loja.uf || '').toString().trim().toUpperCase()))
+            .map(loja => (loja.regiao || '').toString().trim())
+            .filter(Boolean)
+    )].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+}
+
+function renderRegionFilters() {
+    const regioesContainer = document.getElementById('filterRegioesContainer');
+    const regiaoHint = document.getElementById('filterRegioesHint');
+    if (!regioesContainer) return;
+
+    const selectedUFs = activeFilters.uf || [];
+    if (!selectedUFs.length) {
+        activeFilters.regiao = [];
+        regioesContainer.innerHTML = '';
+        if (regiaoHint) {
+            regiaoHint.textContent = 'Selecione uma ou mais UFs para listar as regiões.';
+        }
+        return;
+    }
+
+    const regioes = getRegionsByUFs(selectedUFs);
+    activeFilters.regiao = activeFilters.regiao.filter(regiao => regioes.includes(regiao));
+
+    let html = '';
+    regioes.forEach(regiao => {
+        const checked = activeFilters.regiao.includes(regiao) ? 'checked' : '';
+        html += `
+            <label class="filter-checkbox">
+                <input type="checkbox" data-filter-regiao="${regiao}" ${checked}>
+                <span>${regiao}</span>
+            </label>
+        `;
+    });
+
+    regioesContainer.innerHTML = html;
+    regioesContainer.querySelectorAll('input[data-filter-regiao]').forEach(inp => {
+        inp.addEventListener('change', function () {
+            const regiao = this.dataset.filterRegiao;
+            setRegiaoFilter(regiao, this.checked);
+            applyFilters();
+        });
+    });
+
+    if (regiaoHint) {
+        regiaoHint.textContent = regioes.length
+            ? 'Selecione uma ou mais regiões da UF escolhida.'
+            : 'Nenhuma região encontrada para a UF selecionada.';
+    }
+
+    log(`${regioes.length} regioes disponiveis para as UFs selecionadas`, 'log');
+}
+
 /**
  * Configura event listeners para inputs de texto
  */
 function setupTextFilterListeners() {
     const filterNome = document.getElementById('filterNome');
     if (filterNome) {
-        filterNome.addEventListener('input', function() {
+        filterNome.addEventListener('input', function () {
             setNomeFantasiaFilter(this.value);
         });
     }
 
     const filterCodigo = document.getElementById('filterCodigo');
     if (filterCodigo) {
-        filterCodigo.addEventListener('input', function() {
+        filterCodigo.addEventListener('input', function () {
             setCodigoFilter(this.value);
         });
     }
 
     const filterCNPJ = document.getElementById('filterCNPJ');
     if (filterCNPJ) {
-        filterCNPJ.addEventListener('input', function() {
+        filterCNPJ.addEventListener('input', function () {
             setCNPJFilter(this.value);
         });
     }
 
     const filterEndereco = document.getElementById('filterEndereco');
     if (filterEndereco) {
-        filterEndereco.addEventListener('input', function() {
+        filterEndereco.addEventListener('input', function () {
             setEnderecoFilter(this.value);
         });
     }
 
     const filterSupervisor = document.getElementById('filterSupervisor');
     if (filterSupervisor) {
-        filterSupervisor.addEventListener('input', function() {
+        filterSupervisor.addEventListener('input', function () {
             setSupervisorFilter(this.value);
         });
     }
 
-    // Field: quick combined filter (press Enter or click Apply)
     const filterQuick = document.getElementById('filterQuick');
     if (filterQuick) {
-        filterQuick.addEventListener('keydown', function(e) {
+        filterQuick.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') {
                 applyQuickFilter(this.value);
             }
@@ -152,51 +198,44 @@ function setupTextFilterListeners() {
  * Configura event listeners dos botões
  */
 function setupButtonListeners() {
-    // Botão de limpar filtros
     const clearFiltersBtn = document.getElementById('clearFiltersBtn');
     if (clearFiltersBtn) {
-        clearFiltersBtn.addEventListener('click', function() {
+        clearFiltersBtn.addEventListener('click', function () {
             clearAllFilters();
             updateFilterUI();
         });
     }
 
-    // Botão de exportar CSV
     const exportFilteredBtn = document.getElementById('exportFiltersBtn');
     if (exportFilteredBtn) {
         exportFilteredBtn.addEventListener('click', exportFilteredToCSV);
     }
 
-    // Botão de aplicar filtros
     const applyFiltersBtn = document.getElementById('applyFiltersBtn');
     if (applyFiltersBtn) {
-        applyFiltersBtn.addEventListener('click', function() {
+        applyFiltersBtn.addEventListener('click', function () {
             applyFilters();
         });
     }
 
-    // Quick apply button
     const applyQuickBtn = document.getElementById('applyQuickFilterBtn');
     if (applyQuickBtn) {
-        applyQuickBtn.addEventListener('click', function() {
+        applyQuickBtn.addEventListener('click', function () {
             const v = document.getElementById('filterQuick') ? document.getElementById('filterQuick').value : '';
             applyQuickFilter(v);
         });
     }
 
-    // Botão de mostrar/ocultar filtros
     const toggleFiltersBtn = document.getElementById('toggleFiltersBtn');
     if (toggleFiltersBtn) {
         toggleFiltersBtn.addEventListener('click', toggleFiltersPanel);
     }
 
-    // Botão de fechar filtros
     const closeFiltersBtn = document.getElementById('closeFiltersBtn');
     if (closeFiltersBtn) {
         closeFiltersBtn.addEventListener('click', closeFiltersPanel);
     }
 
-    // Botões da legenda
     const legendShowAll = document.getElementById('legendShowAll');
     if (legendShowAll) {
         legendShowAll.addEventListener('click', activateAllLegendStatus);
@@ -242,7 +281,7 @@ function openFiltersPanel() {
 }
 
 /**
- * Verifica se painel de filtros está aberto
+ * Verifica se painel de filtros esta aberto
  * @returns {boolean}
  */
 function isFiltersPanelOpen() {
@@ -250,19 +289,17 @@ function isFiltersPanelOpen() {
     return panel ? panel.classList.contains('filters-panel-open') : false;
 }
 
-console.log('✓ filters-init-fixed.js carregado com sucesso');
+console.log('filters-init-fixed.js carregado com sucesso');
 
 /**
- * Aplica um único texto a todos os filtros de texto e executa a filtragem.
- * Usado apenas para teste rápido.
+ * Aplica um unico texto a todos os filtros de texto e executa a filtragem.
+ * Usado apenas para teste rapido.
  */
 function applyQuickFilter(value) {
     const v = (value || '').toString().trim();
-    // Use the centralized quick-search in filter-manager-fixed.js for broader matching
     if (typeof searchAndApplyQuickFilter === 'function') {
         searchAndApplyQuickFilter(v);
     } else {
-        // Fallback to original behaviour
         setNomeFantasiaFilter(v);
         setEnderecoFilter(v);
         setCNPJFilter(v);

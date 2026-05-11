@@ -28,7 +28,7 @@ function applyFilters() {
         } else if (activeFilters.status.length) {
             result = result.filter(l => activeFilters.status.includes(typeof normalizeStatus === 'function' ? normalizeStatus(l.statusCor) : (l.statusCor || '').toString().toLowerCase()));
         }
-        if (activeFilters.regiao.length) result = result.filter(l => activeFilters.regiao.some(r => (l.regiao || '').toLowerCase().includes(r.toLowerCase())));
+        if (activeFilters.regiao.length) result = result.filter(l => activeFilters.regiao.includes((l.regiao || '').toString().trim()));
         if (activeFilters.rede.length) result = result.filter(l => activeFilters.rede.some(r => (l.rede || '').toLowerCase().includes(r.toLowerCase())));
         if (activeFilters.uf.length) result = result.filter(l => activeFilters.uf.includes((l.uf || '').toUpperCase()));
         if (activeFilters.supervisor && activeFilters.supervisor.trim()) { const q = activeFilters.supervisor.toLowerCase(); result = result.filter(l => (l.supervisor || '').toLowerCase().includes(q)); }
@@ -54,6 +54,9 @@ function applyFilters() {
 function clearAllFilters() {
     activeFilters = { status: [], regiao: [], rede: [], uf: [], supervisor: '', endereco: '', cnpj: '', codigo: '', nomeFantasia: '' };
     filteredLojas = [];
+    if (typeof renderRegionFilters === 'function') {
+        renderRegionFilters();
+    }
     updateFilterUI();
     clearMarkers();
     addMarkersToMap(getLojas());
@@ -122,6 +125,13 @@ function updateFilterUI() {
     const cnpj = document.getElementById('filterCNPJ'); if (cnpj) cnpj.value = activeFilters.cnpj || '';
     const endereco = document.getElementById('filterEndereco'); if (endereco) endereco.value = activeFilters.endereco || '';
     const supervisor = document.getElementById('filterSupervisor'); if (supervisor) supervisor.value = activeFilters.supervisor || '';
+
+    const regiaoHint = document.getElementById('filterRegioesHint');
+    if (regiaoHint) {
+        regiaoHint.textContent = activeFilters.uf.length
+            ? 'Selecione uma ou mais regiões da UF escolhida.'
+            : 'Selecione uma ou mais UFs para listar as regiões.';
+    }
 }
 
 function exportFilteredToCSV() {

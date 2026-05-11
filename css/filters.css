@@ -75,6 +75,30 @@
     text-transform: uppercase;
 }
 
+.filter-group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+.filter-group-header h4 {
+    margin-bottom: 0;
+}
+
+.filter-hint {
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    color: var(--color-texto-secundario);
+}
+
+.filter-checkboxes:empty::after {
+    content: "Nenhuma opção disponível";
+    font-size: var(--font-size-sm);
+    color: var(--color-texto-secundario);
+}
+
 /* Inputs de Filtro */
 .filter-input {
     width: 100%;
@@ -141,6 +165,16 @@
 
 .btn-filter-action:hover {
     background: #1a6b1a;
+}
+
+.btn-filter-action.btn-filter-secondary {
+    background: var(--color-fundo);
+    color: var(--color-texto-principal);
+    border: 1px solid var(--color-borda);
+}
+
+.btn-filter-action.btn-filter-secondary:hover {
+    background: #e9ecef;
 }
 
 .btn-filter-action:active {
