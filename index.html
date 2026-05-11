@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Mapa interativo de lojas Preferenza com visualização geográfica e análise de faturamento">
+    <meta name="author" content="Preferenza">
+    <title>Mapa Interativo - Lojas Preferenza</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css" />
+
+    <!-- Leaflet Marker Cluster CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.1/dist/MarkerCluster.Default.css" />
+
+    <!-- Nossos Estilos -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/filters.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="header-title">
+                    <h1>📍 Mapa de Lojas - Preferenza</h1>
+                    <p class="header-subtitle">Visualização geográfica e análise de faturamento</p>
+                </div>
+                <div class="header-buttons">
+                    <button id="toggleLegendBtn" class="btn-toggle-filters" title="Mostrar/ocultar legenda">
+                        <span class="icon">📊</span>
+                        <span class="text">Filtros e Legenda</span>
+                    </button>
+                    <button id="updateBtn" class="btn-update" title="Atualizar dados da planilha">
+                        <span class="icon">🔄</span>
+                        <span class="text">Atualizar</span>
+                    </button>
+                </div>
+            </div>
+            <div id="updateStatus" class="update-status"></div>
+        </header>
+
+        <!-- Container Principal -->
+        <div class="main-container">
+            <!-- Painel de Filtros Removido -->
+
+            <!-- Mapa -->
+            <div id="map" class="map-container"></div>
+
+            <!-- Legenda (Lateral Direita) -->
+            <aside class="legend" id="legendPanel">
+                <div class="legend-header">
+                    <h3>📊 Filtros e Legenda</h3>
+                    <button id="closeLegendBtn" class="btn-close-filters" title="Ocultar painel">✕</button>
+                </div>
+
+                <div class="filter-group"
+                    style="margin-bottom: 16px; border-bottom: 1px solid #ddd; padding-bottom: 16px;">
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <input type="text" id="filterQuick" placeholder="Buscar loja..." class="filter-input"
+                            style="flex:1; margin-bottom:0;">
+                        <button id="applyQuickFilterBtn" class="btn-filter-action">Buscar</button>
+                    </div>
+                </div>
+                <div class="legend-content">
+                    <div class="legend-item" data-status="verde">
+                        <span class="legend-color" style="background: #228B22;"></span>
+                        <span class="legend-label">Atendimento < 30 Dias</span>
+                    </div>
+                    <div class="legend-item" data-status="laranja">
+                        <span class="legend-color" style="background: #FF8C00;"></span>
+                        <span class="legend-label">Atendimento 30 a 45 dias</span>
+                    </div>
+                    <div class="legend-item" data-status="vermelho">
+                        <span class="legend-color" style="background: #DC143C;"></span>
+                        <span class="legend-label">Atendimento > 45 Dias</span>
+                    </div>
+                    <div class="legend-item" data-status="cinza">
+                        <span class="legend-color" style="background: #808080;"></span>
+                        <span class="legend-label">Oportunidades</span>
+                    </div>
+                    <div class="legend-item" data-status="roxa">
+                        <span class="legend-color" style="background: #7C3AED;"></span>
+                        <span class="legend-label">Atendidas Por Terceiro</span>
+                    </div>
+                </div>
+
+                <div class="legend-controls">
+                    <button id="legendShowAll" class="btn-legend-control" title="Mostrar todas as lojas">
+                        ✓ Mostrar Todas
+                    </button>
+                    <button id="legendHideAll" class="btn-legend-control" title="Ocultar todas as lojas">
+                        ✗ Ocultar Todas
+                    </button>
+                </div>
+
+                <div class="legend-stats">
+                    <p><strong>Total de Lojas:</strong> <span id="totalLojas">0</span></p>
+                    <p><strong>Última Atualização:</strong> <span id="lastUpdate">-</span></p>
+                </div>
+            </aside>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2026 Preferenza. Todos os direitos reservados. | Versão 2.0</p>
+        </footer>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Carregando dados...</p>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
+
+    <!-- Leaflet Marker Cluster JS -->
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.1/dist/leaflet.markercluster.js"></script>
+
+    <!-- Nossos Scripts (ordem importa!) -->
+    <script src="data/config.json"></script>
+    <script src="js/utils-fixed.js"></script>
+    <script src="js/map-config.js"></script>
+    <script src="js/data-loader-v5.js"></script>
+    <script src="js/marker-manager-gota-v2.js"></script>
+    <script src="js/popup-handler.js"></script>
+    <script src="js/cluster-manager.js"></script>
+    <script src="js/filter-manager-fixed.js"></script>
+    <script src="js/legend-manager.js"></script>
+    <script src="js/filters-init-fixed.js"></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>

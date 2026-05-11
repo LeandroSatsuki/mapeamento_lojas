@@ -1,0 +1,82 @@
+{
+  "app": {
+    "title": "Mapa Interativo - Lojas Preferenza",
+    "version": "1.0.0",
+    "description": "Visualização geográfica das lojas com análise de faturamento e cobertura operacional"
+  },
+  "map": {
+    "center": [-14.2350, -51.9253],
+    "initialZoom": 4,
+    "minZoom": 3,
+    "maxZoom": 18,
+    "tileLayer": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    "attribution": "&copy; OpenStreetMap contributors"
+  },
+  "googleSheets": {
+    "spreadsheetId": "1Yh3cPEEvcM5P9YQIiEyoqch3SCH-RU09",
+    "csvUrl": "https://docs.google.com/spreadsheets/d/1Yh3cPEEvcM5P9YQIiEyoqch3SCH-RU09/export?format=csv&gid=1544229708",
+    "jsonUrl": "https://docs.google.com/spreadsheets/d/1Yh3cPEEvcM5P9YQIiEyoqch3SCH-RU09/export?format=json&gid=1544229708",
+    "updateInterval": 300000,
+    "useTestData": false
+  },
+  "colors": {
+    "verde": {
+      "hex": "#228B22",
+      "rgb": "34, 139, 34",
+      "label": "Faturamento Recente",
+      "status": "RECENTE"
+    },
+    "laranja": {
+      "hex": "#FF8C00",
+      "rgb": "255, 140, 0",
+      "label": "Faturamento Intermediário",
+      "status": "INTERMEDIARIO"
+    },
+    "vermelho": {
+      "hex": "#DC143C",
+      "rgb": "220, 20, 60",
+      "label": "Sem Faturamento",
+      "status": "ANTIGO"
+    },
+    "cinza": {
+      "hex": "#808080",
+      "rgb": "128, 128, 128",
+      "label": "Status Desconhecido",
+      "status": "NUNCA"
+    }
+  },
+  "logos": {
+    "path": "images/logos/",
+    "size": 28,
+    "format": "png",
+    "networks": {
+      "ATACADO VEM": "atacado-vem.png",
+      "CARREFOUR": "carrefour.png",
+      "CASA GRANDE": "casagrande.png",
+      "DMA": "dma.png",
+      "EPA": "epa.png",
+      "EXTRA BOM": "extrabom.png",
+      "EXTRA PLUS": "extraplus.png",
+      "GERMANS": "germans.png",
+      "GRASSI": "grassi.png",
+      "GUANABARA": "guanabara.png",
+      "MARTINS": "martins.png",
+      "MINEIRAO": "mineirao.png",
+      "PERIM": "perim.png",
+      "REDE MAIS BRASIL": "redemaisbrasil.png",
+      "SAMS": "sams.png",
+      "SENDAS": "sendas.png",
+      "VIANENSE": "vianense.png"
+    }
+  },
+  "cluster": {
+    "enabled": true,
+    "maxClusterRadius": 80,
+    "disableClusteringAtZoom": 9
+  },
+  "performance": {
+    "enableCache": true,
+    "cacheDuration": 3600000,
+    "lazyLoadPopups": true
+  }
+}

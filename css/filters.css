@@ -1,0 +1,342 @@
+/**
+ * ============================================
+ * ESTILOS - FILTROS E LEGENDA INTERATIVA
+ * ============================================
+ */
+
+/* Painel de Filtros */
+.filters-panel {
+    position: fixed;
+    left: 0;
+    top: 120px;
+    width: 300px;
+    max-height: calc(100vh - 140px);
+    background: white;
+    border-right: 1px solid var(--color-borda);
+    box-shadow: var(--shadow-md);
+    overflow-y: auto;
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform var(--transition-normal);
+}
+
+.filters-panel.filters-panel-open {
+    transform: translateX(0);
+}
+
+.filters-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--color-borda);
+    background: var(--color-fundo);
+}
+
+.filters-header h3 {
+    margin: 0;
+    font-size: var(--font-size-md);
+    color: var(--color-texto-principal);
+}
+
+.btn-close-filters {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: var(--color-texto-secundario);
+    transition: color var(--transition-fast);
+}
+
+.btn-close-filters:hover {
+    color: var(--color-texto-principal);
+}
+
+.filters-content {
+    padding: var(--spacing-md);
+}
+
+/* Grupos de Filtro */
+.filter-group {
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--color-borda);
+}
+
+.filter-group:last-child {
+    border-bottom: none;
+}
+
+.filter-group h4 {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-texto-principal);
+    margin-bottom: var(--spacing-sm);
+    text-transform: uppercase;
+}
+
+/* Inputs de Filtro */
+.filter-input {
+    width: 100%;
+    padding: var(--spacing-sm) var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+    border: 1px solid var(--color-borda);
+    border-radius: 4px;
+    font-size: var(--font-size-sm);
+    font-family: var(--font-family);
+    transition: border-color var(--transition-fast);
+}
+
+.filter-input:focus {
+    outline: none;
+    border-color: var(--color-verde);
+    box-shadow: 0 0 0 2px rgba(34, 139, 34, 0.1);
+}
+
+/* Checkboxes de Filtro */
+.filter-checkboxes {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.filter-checkbox {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+    color: var(--color-texto-principal);
+    transition: color var(--transition-fast);
+}
+
+.filter-checkbox input[type="checkbox"] {
+    margin-right: var(--spacing-sm);
+    cursor: pointer;
+    accent-color: var(--color-verde);
+}
+
+.filter-checkbox:hover {
+    color: var(--color-verde);
+}
+
+/* Botões de Ação do Filtro */
+.filter-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    margin: var(--spacing-lg) 0;
+}
+
+.btn-filter-action {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--color-verde);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.btn-filter-action:hover {
+    background: #1a6b1a;
+}
+
+.btn-filter-action:active {
+    transform: scale(0.98);
+}
+
+/* Estatísticas dos Filtros */
+.filter-stats {
+    background: var(--color-fundo);
+    padding: var(--spacing-md);
+    border-radius: 4px;
+    font-size: var(--font-size-sm);
+    color: var(--color-texto-principal);
+}
+
+.filter-stats p {
+    margin: var(--spacing-sm) 0;
+}
+
+.filter-stats strong {
+    color: var(--color-verde);
+}
+
+/* Botão de Filtros no Header */
+.header-buttons {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.btn-toggle-filters {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: white;
+    color: var(--color-verde);
+    border: 2px solid var(--color-verde);
+    border-radius: 4px;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-toggle-filters:hover {
+    background: var(--color-verde);
+    color: white;
+}
+
+.btn-toggle-filters .icon {
+    font-size: 18px;
+}
+
+/* Legenda Interativa */
+.legend-interactive {
+    cursor: default;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-sm);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    user-select: none;
+}
+
+.legend-item:hover {
+    background: var(--color-fundo);
+    transform: translateX(4px);
+}
+
+.legend-item.legend-item-disabled {
+    opacity: 0.5;
+}
+
+.legend-item.legend-item-disabled .legend-color {
+    filter: grayscale(100%);
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+    margin-right: var(--spacing-md);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    transition: all var(--transition-fast);
+}
+
+.legend-item:hover .legend-color {
+    transform: scale(1.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.legend-label {
+    font-size: var(--font-size-sm);
+    color: var(--color-texto-principal);
+    font-weight: 500;
+}
+
+/* Controles da Legenda */
+.legend-controls {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    margin: var(--spacing-md) 0;
+    padding: var(--spacing-md) 0;
+    border-top: 1px solid var(--color-borda);
+    border-bottom: 1px solid var(--color-borda);
+}
+
+.btn-legend-control {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--color-fundo);
+    color: var(--color-texto-principal);
+    border: 1px solid var(--color-borda);
+    border-radius: 4px;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-legend-control:hover {
+    background: var(--color-verde);
+    color: white;
+    border-color: var(--color-verde);
+}
+
+.btn-legend-control:active {
+    transform: scale(0.98);
+}
+
+/* Estatísticas da Legenda */
+.legend-stats {
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--color-borda);
+    font-size: var(--font-size-sm);
+    color: var(--color-texto-principal);
+}
+
+.legend-stats p {
+    margin: var(--spacing-sm) 0;
+}
+
+.legend-stats strong {
+    color: var(--color-verde);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .filters-panel {
+        width: 100%;
+        max-height: 50vh;
+        top: auto;
+        bottom: 0;
+        border-right: none;
+        border-top: 1px solid var(--color-borda);
+        transform: translateY(100%);
+    }
+
+    .filters-panel.filters-panel-open {
+        transform: translateY(0);
+    }
+
+    .header-buttons {
+        flex-wrap: wrap;
+    }
+
+    .btn-toggle-filters .text {
+        display: none;
+    }
+
+    .legend {
+        width: 100%;
+        max-height: 30vh;
+        right: auto;
+        left: 0;
+        bottom: auto;
+        top: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .filters-panel {
+        width: 100%;
+        max-height: 60vh;
+    }
+
+    .filter-input {
+        font-size: 16px; /* Previne zoom em iOS */
+    }
+
+    .btn-filter-action {
+        padding: var(--spacing-md) var(--spacing-lg);
+    }
+}
