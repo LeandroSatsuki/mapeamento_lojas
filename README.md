@@ -49,11 +49,14 @@ mapa-lojas-preferenza/
 ├── js/
 │   ├── main.js                   # Orquestração principal
 │   ├── map-config.js             # Configuração do mapa
-│   ├── data-loader.js            # Carregamento de dados
-│   ├── marker-manager.js         # Gerenciamento de marcadores
+│   ├── data-loader-v5.js         # Carregamento de dados
+│   ├── marker-manager-gota-v2.js # Gerenciamento de marcadores
 │   ├── popup-handler.js          # Tratamento de popups
 │   ├── cluster-manager.js        # Clusterização
-│   └── utils.js                  # Funções utilitárias
+│   ├── filter-manager-fixed.js   # Filtros
+│   ├── filters-init-fixed.js     # Inicialização dos filtros
+│   ├── legend-manager.js         # Legenda interativa
+│   └── utils-fixed.js            # Funções utilitárias
 │
 ├── data/
 │   └── config.json               # Configurações da aplicação
@@ -189,11 +192,14 @@ Edite este arquivo para customizar a aplicação:
 ```
 main.js (orquestrador)
   ├── map-config.js (mapa)
-  ├── data-loader.js (dados)
-  ├── marker-manager.js (marcadores)
+  ├── data-loader-v5.js (dados)
+  ├── marker-manager-gota-v2.js (marcadores)
   ├── popup-handler.js (popups)
   ├── cluster-manager.js (clusters)
-  └── utils.js (utilitários)
+  ├── filter-manager-fixed.js (filtros)
+  ├── filters-init-fixed.js (bootstrap dos filtros)
+  ├── legend-manager.js (legenda)
+  └── utils-fixed.js (utilitários)
 ```
 
 ### Adicionando Novo Logo

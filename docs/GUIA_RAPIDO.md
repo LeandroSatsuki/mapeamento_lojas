@@ -198,11 +198,14 @@ mapa-lojas-preferenza/
 ├── js/
 │   ├── main.js ← Lógica principal
 │   ├── map-config.js ← Config do mapa
-│   ├── data-loader.js ← Carrega dados
-│   ├── marker-manager.js ← Marcadores
+│   ├── data-loader-v5.js ← Carrega dados
+│   ├── marker-manager-gota-v2.js ← Marcadores
 │   ├── popup-handler.js ← Popups
 │   ├── cluster-manager.js ← Clusters
-│   └── utils.js ← Funções auxiliares
+│   ├── filter-manager-fixed.js ← Filtros
+│   ├── filters-init-fixed.js ← Inicialização dos filtros
+│   ├── legend-manager.js ← Legenda
+│   └── utils-fixed.js ← Funções auxiliares
 │
 ├── data/
 │   └── config.json ← Mude URL aqui

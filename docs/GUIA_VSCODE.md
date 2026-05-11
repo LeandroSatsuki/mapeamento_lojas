@@ -189,11 +189,14 @@ Aqui está o que cada arquivo faz:
 |---------|--------|
 | `main.js` | Arquivo principal (orquestra tudo) |
 | `map-config.js` | Configuração do mapa Leaflet |
-| `data-loader.js` | Carrega dados da Google Sheets |
-| `marker-manager.js` | Cria e gerencia marcadores |
+| `data-loader-v5.js` | Carrega dados da Google Sheets |
+| `marker-manager-gota-v2.js` | Cria e gerencia marcadores |
 | `popup-handler.js` | Gerencia popups (janelas de info) |
 | `cluster-manager.js` | Agrupa marcadores próximos |
-| `utils.js` | Funções auxiliares reutilizáveis |
+| `filter-manager-fixed.js` | Aplica filtros e busca rápida |
+| `filters-init-fixed.js` | Inicializa eventos do painel de filtros |
+| `legend-manager.js` | Controla legenda e contadores |
+| `utils-fixed.js` | Funções auxiliares reutilizáveis |
 
 ### 📁 Pasta `data/`
 
