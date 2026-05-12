@@ -326,6 +326,29 @@
     color: var(--color-verde);
 }
 
+.region-overlay-label {
+    background: transparent;
+    border: none;
+}
+
+.region-overlay-label span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 72px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    color: var(--color-texto-principal);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0;
+    box-shadow: var(--shadow-sm);
+    white-space: nowrap;
+}
+
 /* Responsividade */
 @media (max-width: 768px) {
     .filters-panel {

@@ -19,6 +19,7 @@ async function initializeApp() {
 
         // 2. Inicializar mapa
         initializeMap();
+        if (typeof initializeRegionLayer === 'function') initializeRegionLayer();
 
         // 3. Inicializar grupo de clusters
         initializeClusterGroup();
@@ -42,6 +43,7 @@ async function initializeApp() {
 
         // 9. Atualizar exibição de estatísticas
         updateLastUpdateDisplay();
+        if (typeof updateRegionOverlays === 'function') updateRegionOverlays();
 
         log('Aplicação inicializada com sucesso!', 'log');
         showStatus('Mapa carregado com sucesso!', 'success', 2000);
@@ -179,6 +181,7 @@ async function onUpdateButtonClick() {
         // Atualizar marcadores
         clearMarkers();
         addMarkersToMap(getLojas());
+        if (typeof updateRegionOverlays === 'function') updateRegionOverlays();
 
         // Atualizar estatísticas
         updateLastUpdateDisplay();

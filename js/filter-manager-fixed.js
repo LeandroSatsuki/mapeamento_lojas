@@ -11,10 +11,30 @@ let activeFilters = {
 
 let filteredLojas = [];
 
+function getNonTextFilteredLojas(lojas) {
+    let result = (lojas || []).slice();
+
+    if (typeof getLegendState === 'function') {
+        const ls = getLegendState();
+        result = result.filter(l => {
+            const s = typeof normalizeStatus === 'function' ? normalizeStatus(l.statusCor) : (l.statusCor || '').toString().toLowerCase();
+            return ls[s] !== false;
+        });
+    } else if (activeFilters.status.length) {
+        result = result.filter(l => activeFilters.status.includes(typeof normalizeStatus === 'function' ? normalizeStatus(l.statusCor) : (l.statusCor || '').toString().toLowerCase()));
+    }
+
+    if (activeFilters.regiao.length) result = result.filter(l => activeFilters.regiao.includes((l.regiao || '').toString().trim()));
+    if (activeFilters.rede.length) result = result.filter(l => activeFilters.rede.some(r => (l.rede || '').toLowerCase().includes(r.toLowerCase())));
+    if (activeFilters.uf.length) result = result.filter(l => activeFilters.uf.includes((l.uf || '').toUpperCase()));
+
+    return result;
+}
+
 function applyFilters() {
     try {
         const lojas = getLojas() || [];
-        let result = lojas.slice();
+        let result = getNonTextFilteredLojas(lojas);
         // A legenda eh a fonte principal do filtro por status. Os demais
         // filtros refinam esse conjunto sem quebrar a selecao visual.
 
@@ -41,6 +61,7 @@ function applyFilters() {
         updateFilterUI();
         clearMarkers();
         addMarkersToMap(filteredLojas);
+        if (typeof updateRegionOverlays === 'function') updateRegionOverlays();
         updateLegendCounts();
         log(`Filtros aplicados: ${filteredLojas.length} lojas encontradas`, 'log');
         showStatus(`${filteredLojas.length} lojas encontradas`, 'success', 1200);
@@ -60,6 +81,7 @@ function clearAllFilters() {
     updateFilterUI();
     clearMarkers();
     addMarkersToMap(getLojas());
+    if (typeof updateRegionOverlays === 'function') updateRegionOverlays();
     updateLegendCounts();
     log('Todos os filtros foram limpos', 'log');
     showStatus('Filtros limpos', 'info', 1000);
@@ -153,7 +175,7 @@ function searchAndApplyQuickFilter(query) {
         // Simulando que vamos limpar a busca rápida, então as lojas devem refletir apenas o estado da legenda.
         // Busca vazia nao significa "mostrar tudo" cegamente; ela precisa
         // respeitar o estado atual da legenda para manter coerencia visual.
-        let baseLojas = getLojas() || [];
+        let baseLojas = getNonTextFilteredLojas(getLojas() || []);
 
         if (typeof getLegendState === 'function') {
             const ls = getLegendState();
@@ -167,6 +189,7 @@ function searchAndApplyQuickFilter(query) {
         updateFilterUI();
         clearMarkers();
         addMarkersToMap(filteredLojas);
+        if (typeof updateRegionOverlays === 'function') updateRegionOverlays();
         updateLegendCounts();
         showStatus(`${filteredLojas.length} lojas exibidas`, 'info', 1000);
         log('Busca rápida vazia: exibindo status base', 'log');
@@ -177,7 +200,7 @@ function searchAndApplyQuickFilter(query) {
     // do filtro de legendas atualmente ativo (se houver alguma seleção de status ativa).
     // A busca rapida trabalha sobre a base ja filtrada pela legenda,
     // mantendo coerencia entre painel lateral e mapa.
-    let baseLojas = getLojas() || [];
+    let baseLojas = getNonTextFilteredLojas(getLojas() || []);
 
     if (typeof getLegendState === 'function') {
         const ls = getLegendState();
@@ -209,6 +232,7 @@ function searchAndApplyQuickFilter(query) {
     updateFilterUI();
     clearMarkers();
     addMarkersToMap(filteredLojas);
+    if (typeof updateRegionOverlays === 'function') updateRegionOverlays();
     updateLegendCounts();
     log(`Busca rápida: ${filteredLojas.length} lojas encontradas para "${query}"`, 'log');
     showStatus(`${filteredLojas.length} lojas encontradas`, 'success', 1200);
