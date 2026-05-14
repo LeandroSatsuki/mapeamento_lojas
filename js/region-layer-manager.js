@@ -141,14 +141,23 @@ function buildRegionGeometry(stores) {
     const featureCollection = turf.featureCollection(uniquePoints.map(point => turf.point(point)));
 
     let geometry = turf.concave(featureCollection, { maxEdge: 250, units: 'kilometers' });
-    if (!geometry) {
-        geometry = turf.convex(featureCollection);
+    if (!geometry || !geometryCoversAllPoints(geometry, uniquePoints)) {
+        geometry = buildFallbackConvexGeometry(featureCollection);
     }
     if (!geometry) {
         geometry = turf.buffer(turf.lineString(uniquePoints), 6, { units: 'kilometers' });
     }
 
     return geometry;
+}
+
+function buildFallbackConvexGeometry(featureCollection) {
+    let geometry = turf.convex(featureCollection);
+    if (!geometry) return null;
+
+    // Um buffer pequeno ajuda a dar corpo visual sem perder a ideia
+    // de "ligar os extremos" quando a regiao esta muito espalhada.
+    return turf.buffer(geometry, 4, { units: 'kilometers' });
 }
 
 function dedupeCoordinates(points) {
@@ -158,6 +167,18 @@ function dedupeCoordinates(points) {
         if (seen.has(key)) return false;
         seen.add(key);
         return true;
+    });
+}
+
+function geometryCoversAllPoints(geometry, points) {
+    if (!geometry || typeof turf === 'undefined') return false;
+
+    return points.every(point => {
+        try {
+            return turf.booleanPointInPolygon(turf.point(point), geometry, { ignoreBoundary: false });
+        } catch (error) {
+            return false;
+        }
     });
 }
 

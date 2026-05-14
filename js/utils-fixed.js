@@ -1,9 +1,9 @@
 /**
  * ============================================
- * FUNÇÕES UTILITÁRIAS - MAPA INTERATIVO (CORRIGIDO)
+ * FUNÃ‡Ã•ES UTILITÃRIAS - MAPA INTERATIVO (CORRIGIDO)
  * ============================================
- * Arquivo com funções auxiliares reutilizáveis
- * VERSÃO CORRIGIDA: normalizeStatus com limpeza de espaços
+ * Arquivo com funÃ§Ãµes auxiliares reutilizÃ¡veis
+ * VERSÃƒO CORRIGIDA: normalizeStatus com limpeza de espaÃ§os
  */
 
 /**
@@ -55,7 +55,7 @@ function parseCSV(csvText) {
         return [];
     }
 
-    // Primeira linha é o header
+    // Primeira linha Ã© o header
     const headers = lines[0].split(',').map(h => h.trim());
     const data = [];
 
@@ -114,7 +114,7 @@ function parseCSVLine(line) {
  * Valida coordenadas de latitude e longitude
  * @param {number} lat - Latitude
  * @param {number} lng - Longitude
- * @returns {boolean} - True se válido
+ * @returns {boolean} - True se vÃ¡lido
  */
 function isValidCoordinates(lat, lng) {
     const latNum = parseFloat(lat);
@@ -131,7 +131,7 @@ function isValidCoordinates(lat, lng) {
 }
 
 /**
- * Formata data para exibição
+ * Formata data para exibiÃ§Ã£o
  * @param {Date|string} date - Data a formatar
  * @returns {string} - Data formatada
  */
@@ -156,7 +156,7 @@ function formatDate(date) {
 }
 
 /**
- * Formata hora para exibição (HH:MM)
+ * Formata hora para exibiÃ§Ã£o (HH:MM)
  * @param {Date|string} date - Data/hora a formatar
  * @returns {string} - Hora formatada
  */
@@ -214,7 +214,7 @@ function hideLoadingSpinner() {
  * Mostra mensagem de status
  * @param {string} message - Mensagem a exibir
  * @param {string} type - Tipo: 'success' ou 'error'
- * @param {number} duration - Duração em ms (0 = permanente)
+ * @param {number} duration - DuraÃ§Ã£o em ms (0 = permanente)
  */
 function showStatus(message, type = 'success', duration = 3000) {
     const statusEl = document.getElementById('updateStatus');
@@ -241,9 +241,9 @@ function hideStatus() {
 }
 
 /**
- * Obtém cor baseada no status
+ * ObtÃ©m cor baseada no status
  * @param {string} status - Status (verde, laranja, vermelho, cinza)
- * @returns {string} - Código hex da cor
+ * @returns {string} - CÃ³digo hex da cor
  */
 function getColorByStatus(status) {
     const colors = {
@@ -258,85 +258,54 @@ function getColorByStatus(status) {
 
 /**
  * Normaliza nome de status
- * CORRIGIDO: Remove espaços extras e caracteres invisíveis
+ * CORRIGIDO: Remove espaÃ§os extras e caracteres invisÃ­veis
  * @param {string} status - Status original
  * @returns {string} - Status normalizado
  */
 function normalizeStatus(status) {
-    console.log('=== NORMALIZANDO STATUS ===');
-    console.log('1. Status recebido (RAW):', status);
-    console.log('2. Tipo:', typeof status);
-    console.log('3. Comprimento:', status ? status.length : 'N/A');
-    console.log('4. Código dos caracteres:', status ? Array.from(status).map(c => c.charCodeAt(0)).join(',') : 'N/A');
-    
     if (!status) {
-        console.log('5. Status vazio! Retornando CINZA');
-        log('Status vazio, usando cinza', 'warn');
         return 'cinza';
     }
 
-    // CORRIGIDO: Remover espaços extras, quebras de linha, tabs, etc
-    // A origem dos dados pode trazer espacos invisiveis e variacoes
-    // sutis; essa limpeza evita status duplicados por detalhe textual.
     const normalized = status
         .toLowerCase()
         .trim()
-        .replace(/\s+/g, ' ')  // Substituir múltiplos espaços por um
-        .replace(/[\n\r\t]/g, ''); // Remover quebras de linha e tabs
+        .replace(/\s+/g, ' ')
+        .replace(/[\n\r\t]/g, '');
 
-    console.log('5. Status normalizado:', normalized);
-    console.log('6. Comprimento normalizado:', normalized.length);
-    console.log('7. Código dos caracteres normalizados:', Array.from(normalized).map(c => c.charCodeAt(0)).join(','));
-    
-    log(`Status original: "${status}" → Normalizado: "${normalized}"`, 'log');
+    const ascii = normalized.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const isNaoRoteirizado = ascii.includes('nao roteirizado');
+    const isRoteirizado = !isNaoRoteirizado && (ascii.includes('roteirizado') || ascii.includes('roterizado'));
+    const hasAtendido = ascii.includes('atendido');
+    const hasSemVenda = ascii.includes('sem venda');
+    const hasComVenda = ascii.includes('com venda');
 
-    // Verificar cada tipo de status
-    const isRoteirizado = normalized.includes('roteirizado') || normalized.includes('roterizado');
-    const isNaoRoteirizado = normalized.includes('não roteirizado') || normalized.includes('nao roteirizado');
-    const hasAtendido = normalized.includes('atendido');
-    const hasSemVenda = normalized.includes('sem venda');
-    const hasComVenda = normalized.includes('com venda');
-
-    console.log('8. Testando VERDE:', (isRoteirizado && hasAtendido) || normalized.includes('verde'));
-    if ((isRoteirizado && hasAtendido) || normalized.includes('verde')) {
-        console.log('✓ VERDE encontrado!');
-        log('Status identificado como: VERDE', 'log');
+    if ((isRoteirizado && hasAtendido) || ascii.includes('verde')) {
         return 'verde';
     }
-    
-    console.log('9. Testando VERMELHO:', (isRoteirizado && hasSemVenda) || normalized.includes('vermelho'));
-    if ((isRoteirizado && hasSemVenda) || normalized.includes('vermelho') || normalized.includes('antigo')) {
-        console.log('✓ VERMELHO encontrado!');
-        log('Status identificado como: VERMELHO', 'log');
-        return 'vermelho';
-    }
 
-    console.log('10. Testando LARANJA:', (isNaoRoteirizado && hasComVenda) || normalized.includes('laranja'));
-    if ((isNaoRoteirizado && hasComVenda) || normalized.includes('laranja')) {
-        console.log('✓ LARANJA encontrado!');
-        log('Status identificado como: LARANJA', 'log');
-        return 'laranja';
-    }
-    
-    console.log('11. Testando CINZA:', (isNaoRoteirizado && hasSemVenda) || normalized.includes('cinza'));
-    if ((isNaoRoteirizado && hasSemVenda) || normalized.includes('cinza') || normalized.includes('nunca')) {
-        console.log('✓ CINZA encontrado!');
-        log('Status identificado como: CINZA', 'log');
+    if ((isNaoRoteirizado && hasSemVenda) || ascii.includes('cinza') || ascii.includes('nunca')) {
         return 'cinza';
     }
 
-    console.log('11. Nenhum match encontrado! Retornando CINZA');
-    log(`Status não reconhecido: "${status}" → Usando CINZA como padrão`, 'warn');
+    if ((isRoteirizado && hasSemVenda) || ascii.includes('vermelho') || ascii.includes('antigo')) {
+        return 'vermelho';
+    }
+
+    if ((isNaoRoteirizado && hasComVenda) || ascii.includes('laranja')) {
+        return 'laranja';
+    }
+
     return 'cinza';
 }
 
 /**
- * Calcula distância entre dois pontos (Haversine)
+ * Calcula distÃ¢ncia entre dois pontos (Haversine)
  * @param {number} lat1 - Latitude ponto 1
  * @param {number} lng1 - Longitude ponto 1
  * @param {number} lat2 - Latitude ponto 2
  * @param {number} lng2 - Longitude ponto 2
- * @returns {number} - Distância em km
+ * @returns {number} - DistÃ¢ncia em km
  */
 function calculateDistance(lat1, lng1, lat2, lng2) {
     const R = 6371; // Raio da Terra em km
@@ -351,7 +320,7 @@ function calculateDistance(lat1, lng1, lat2, lng2) {
 }
 
 /**
- * Formata número como moeda brasileira
+ * Formata nÃºmero como moeda brasileira
  * @param {number} value - Valor a formatar
  * @returns {string} - Valor formatado
  */
@@ -363,7 +332,7 @@ function formatCurrency(value) {
 }
 
 /**
- * Formata número com separadores
+ * Formata nÃºmero com separadores
  * @param {number} value - Valor a formatar
  * @param {number} decimals - Casas decimais
  * @returns {string} - Valor formatado
@@ -376,10 +345,10 @@ function formatNumber(value, decimals = 0) {
 }
 
 /**
- * Debounce para funções
- * @param {Function} func - Função a executar
+ * Debounce para funÃ§Ãµes
+ * @param {Function} func - FunÃ§Ã£o a executar
  * @param {number} wait - Tempo de espera em ms
- * @returns {Function} - Função com debounce
+ * @returns {Function} - FunÃ§Ã£o com debounce
  */
 function debounce(func, wait) {
     let timeout;
@@ -394,10 +363,10 @@ function debounce(func, wait) {
 }
 
 /**
- * Throttle para funções
- * @param {Function} func - Função a executar
- * @param {number} limit - Tempo mínimo entre execuções em ms
- * @returns {Function} - Função com throttle
+ * Throttle para funÃ§Ãµes
+ * @param {Function} func - FunÃ§Ã£o a executar
+ * @param {number} limit - Tempo mÃ­nimo entre execuÃ§Ãµes em ms
+ * @returns {Function} - FunÃ§Ã£o com throttle
  */
 function throttle(func, limit) {
     let inThrottle;
@@ -411,7 +380,7 @@ function throttle(func, limit) {
 }
 
 /**
- * Gera candidatos de caminho para logos com base na configuração e no nome da rede
+ * Gera candidatos de caminho para logos com base na configuraÃ§Ã£o e no nome da rede
  * @param {string} rede
  * @returns {string[]} lista de URLs relativas
  */
@@ -420,18 +389,18 @@ function buildLogoCandidates(rede, logoFilename) {
     const logoMap = (mapConfig && mapConfig.logos && mapConfig.logos.networks) ? mapConfig.logos.networks : {};
     const candidates = [];
 
-    // Se foi fornecido um nome de arquivo explícito na planilha (coluna P), tentar apenas variantes dele
+    // Se foi fornecido um nome de arquivo explÃ­cito na planilha (coluna P), tentar apenas variantes dele
     // Quando a planilha informa um arquivo explicito, priorizamos
     // variacoes dele antes de cair no mapeamento por rede.
     if (logoFilename) {
         const lfRaw = logoFilename.toString().trim();
         if (lfRaw) {
-            // separar extensão se existir
+            // separar extensÃ£o se existir
             const m = lfRaw.match(/^(.*)\.([a-zA-Z0-9]+)$/);
             const base = m ? m[1] : lfRaw;
             const ext = m ? m[2] : '';
 
-            // normalizações: removendo acentos, variando espaços/underscores/hyphens, lower-case
+            // normalizaÃ§Ãµes: removendo acentos, variando espaÃ§os/underscores/hyphens, lower-case
             const normalize = (s) => s
                 .normalize('NFD').replace(/\p{Diacritic}/gu, '') // remover acentos
                 .replace(/[^\w\s-\.]/g, '') // remover caracteres estranhos
@@ -446,7 +415,7 @@ function buildLogoCandidates(rede, logoFilename) {
             variants.add(baseNorm.toLowerCase().replace(/\s+/g, '-'));
             variants.add(baseNorm.toLowerCase().replace(/\s+/g, ''));
 
-            // incluir com e sem extensão; limitar número de variantes para evitar muitas requisições
+            // incluir com e sem extensÃ£o; limitar nÃºmero de variantes para evitar muitas requisiÃ§Ãµes
             let count = 0;
             for (const v of variants) {
                 if (count >= 6) break;
@@ -461,7 +430,7 @@ function buildLogoCandidates(rede, logoFilename) {
                 candidates.push(path + v + '.jpg');
                 count++;
             }
-            // Quando a coluna `logo` existir, não adicionar candidatos baseados em `rede` — assume explicit
+            // Quando a coluna `logo` existir, nÃ£o adicionar candidatos baseados em `rede` â€” assume explicit
             const final = candidates.filter(Boolean);
             return final;
         }
@@ -470,7 +439,7 @@ function buildLogoCandidates(rede, logoFilename) {
     if (rede) {
         // Tentar chave exata do mapa de logos (caso o config contenha o mapeamento)
         if (logoMap[rede]) candidates.push(path + logoMap[rede]);
-        // Versões normais do nome
+        // VersÃµes normais do nome
         const redeNorm = rede.toString().trim();
         candidates.push(path + redeNorm + '.png');
         candidates.push(path + redeNorm.toLowerCase().replace(/\s+/g, '_') + '.png');
@@ -478,14 +447,14 @@ function buildLogoCandidates(rede, logoFilename) {
         candidates.push(path + redeNorm.toLowerCase().replace(/\s+/g, '') + '.png');
     }
 
-    // Fallbacks conhecidos presentes no repositório
+    // Fallbacks conhecidos presentes no repositÃ³rio
     candidates.push(path + 'bh.png');
     candidates.push(path + 'martins.png');
     return candidates.filter(Boolean);
 }
 
 /**
- * Retorna o primeiro candidato de logo (não verifica existência — browser fará o carregamento)
+ * Retorna o primeiro candidato de logo (nÃ£o verifica existÃªncia â€” browser farÃ¡ o carregamento)
  * @param {string} rede
  * @returns {string}
  */
@@ -493,16 +462,76 @@ function getLogoSrc(rede, logoFilename) {
     const c = buildLogoCandidates(rede, logoFilename);
     return c.length ? c[0] : 'images/logos/bh.png';
 }
+const optimizedLogoCache = new Map();
+const optimizedLogoPending = new Set();
+
+function getOptimizedLogoSrc(originalSrc) {
+    if (!originalSrc) return originalSrc;
+    if (optimizedLogoCache.has(originalSrc)) {
+        return optimizedLogoCache.get(originalSrc);
+    }
+
+    requestOptimizedLogo(originalSrc);
+    return originalSrc;
+}
+
+function requestOptimizedLogo(originalSrc) {
+    if (!originalSrc || optimizedLogoPending.has(originalSrc)) return;
+    optimizedLogoPending.add(originalSrc);
+
+    const img = new Image();
+    img.decoding = 'async';
+    img.onload = function () {
+        try {
+            const canvas = document.createElement('canvas');
+            const size = 40;
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d', { alpha: true });
+            if (!ctx) throw new Error('Canvas context unavailable');
+
+            ctx.drawImage(img, 0, 0, size, size);
+
+            let dataUrl = '';
+            try {
+                dataUrl = canvas.toDataURL('image/webp', 0.55);
+            } catch (error) {
+                dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+            }
+
+            if (dataUrl) {
+                optimizedLogoCache.set(originalSrc, dataUrl);
+                refreshOptimizedLogoInMarkers(originalSrc, dataUrl);
+            }
+        } catch (error) {
+            optimizedLogoCache.set(originalSrc, originalSrc);
+        } finally {
+            optimizedLogoPending.delete(originalSrc);
+        }
+    };
+    img.onerror = function () {
+        optimizedLogoPending.delete(originalSrc);
+    };
+    img.src = originalSrc;
+}
+
+function refreshOptimizedLogoInMarkers(originalSrc, optimizedSrc) {
+    document.querySelectorAll('.marker-logo[data-original-src]').forEach(img => {
+        if (img.dataset.originalSrc === encodeURI(originalSrc) || img.dataset.originalSrc === originalSrc) {
+            img.src = optimizedSrc;
+        }
+    });
+}
 
 /**
- * Handler para erro de carregamento de imagem: tenta próximos candidatos antes de esconder
+ * Handler para erro de carregamento de imagem: tenta prÃ³ximos candidatos antes de esconder
  * @param {HTMLImageElement} img
  * @param {string} rede
  */
 function handleLogoError(img, rede) {
     try {
         img.onerror = null;
-        // Se o elemento img tiver um atributo data-logo, passá-lo adiante
+        // Se o elemento img tiver um atributo data-logo, passÃ¡-lo adiante
         const logoFilename = img && img.dataset ? img.dataset.logo : null;
         const candidates = buildLogoCandidates(rede, logoFilename);
         const current = img.src || '';
@@ -511,7 +540,7 @@ function handleLogoError(img, rede) {
         let idx = candidates.findIndex(c => current.indexOf(c) !== -1);
         if (idx === -1) idx = 0; else idx = idx + 1;
 
-        // se já tentou muitas vezes, abortar e mostrar fallback
+        // se jÃ¡ tentou muitas vezes, abortar e mostrar fallback
         if (attempts >= 3 || idx >= candidates.length) {
             img.style.display = 'none';
             try {
@@ -525,9 +554,10 @@ function handleLogoError(img, rede) {
             return;
         }
 
-        // tentar próximo candidato
+        // tentar prÃ³ximo candidato
         img.dataset.attempts = String(attempts + 1);
-        img.src = candidates[idx];
+        img.dataset.originalSrc = candidates[idx];
+        img.src = (typeof getOptimizedLogoSrc === 'function') ? getOptimizedLogoSrc(candidates[idx]) : candidates[idx];
         img.onerror = function() { handleLogoError(this, rede); };
     } catch (e) {
         img.style.display = 'none';
@@ -553,7 +583,7 @@ function setCache(key, value) {
 /**
  * Recupera dados do localStorage
  * @param {string} key - Chave
- * @param {number} maxAge - Idade máxima em ms (0 = sem limite)
+ * @param {number} maxAge - Idade mÃ¡xima em ms (0 = sem limite)
  * @returns {*} - Valor armazenado ou null
  */
 function getCache(key, maxAge = 0) {
@@ -580,7 +610,7 @@ function getCache(key, maxAge = 0) {
 
 /**
  * Limpa cache
- * @param {string} key - Chave (opcional, limpa tudo se não informado)
+ * @param {string} key - Chave (opcional, limpa tudo se nÃ£o informado)
  */
 function clearCache(key) {
     try {
@@ -613,19 +643,19 @@ function log(message, type = 'log') {
 }
 
 /**
- * Obtém label do status para exibição
+ * ObtÃ©m label do status para exibiÃ§Ã£o
  * @param {string} status - Status normalizado
- * @returns {string} - Label para exibição
+ * @returns {string} - Label para exibiÃ§Ã£o
  */
 function getStatusLabel(status) {
     const labels = {
         'verde': 'Roteirizado (Atendido)',
-        'laranja': 'Não Roteirizado (Com Venda)',
+        'laranja': 'NÃ£o Roteirizado (Com Venda)',
         'vermelho': 'Roteirizado (Sem Venda)',
-        'cinza': 'Não Roteirizado (Sem Venda)',
+        'cinza': 'NÃ£o Roteirizado (Sem Venda)',
     };
 
     return labels[status] || 'Desconhecido';
 }
 
-console.log('✓ utils-fixed.js carregado com sucesso');
+console.log('âœ“ utils-fixed.js carregado com sucesso');

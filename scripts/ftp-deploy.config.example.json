@@ -1,0 +1,16 @@
+{
+  "server": "ftp://seu-servidor.com.br",
+  "username": "seu-usuario",
+  "password": "sua-senha",
+  "remotePath": "/public_html",
+  "useSsl": false,
+  "passiveMode": true,
+  "cleanRemote": false,
+  "publishPaths": [
+    "index.html",
+    "css",
+    "js",
+    "data",
+    "images"
+  ]
+}

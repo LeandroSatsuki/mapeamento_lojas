@@ -1,6 +1,8 @@
 .DS_Store
 Thumbs.db
 desktop.ini
+scripts/ftp-deploy.config.json
+**/ftp-deploy.config.json
 
 .vscode/
 .idea/

@@ -230,9 +230,13 @@ async function copyToClipboard(text) {
  * @param {Object} loja - Dados da loja
  */
 function openExternalMap(loja) {
-    const url = `https://www.google.com/maps/search/${loja.latitude},${loja.longitude}`;
+    const url = generateExternalMapUrl(loja);
     window.open(url, '_blank');
     log('Abrindo mapa externo para: ' + loja.nomeFantasia, 'log');
+}
+
+function generateExternalMapUrl(loja) {
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${loja.latitude},${loja.longitude}`)}`;
 }
 
 /**

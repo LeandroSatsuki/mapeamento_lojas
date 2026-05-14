@@ -1,8 +1,8 @@
-/**
+﻿/**
  * ============================================
  * GERENCIADOR DE LEGENDA INTERATIVA
  * ============================================
- * Gerencia legenda selecionável e filtros visuais
+ * Gerencia legenda selecionÃ¡vel e filtros visuais
  */
 
 let legendState = {
@@ -12,7 +12,7 @@ let legendState = {
     cinza: true
 };
 
-// Controle global de status visíveis da legenda para uso em plugins externos (ex: Busca)
+// Controle global de status visÃ­veis da legenda para uso em plugins externos (ex: Busca)
 window.activeLegendStatus = {
     'verde': true,
     'laranja': true,
@@ -51,19 +51,7 @@ function initializeLegend() {
  * @param {Element} element - Elemento clicado
  */
 function onLegendItemClick(element) {
-    // Determinar qual status foi clicado
-    const label = element.querySelector('.legend-label').textContent;
-    let status = '';
-
-    if (label.includes('Roteirizado (Atendido)')) {
-        status = 'verde';
-    } else if (label.includes('Não Roteirizado (Com Venda)')) {
-        status = 'laranja';
-    } else if (label.includes('Roteirizado (Sem Venda)')) {
-        status = 'vermelho';
-    } else if (label.includes('Não Roteirizado (Sem Venda)')) {
-        status = 'cinza';
-    }
+    const status = getLegendItemStatus(element);
 
     if (status) {
         toggleLegendStatus(status, element);
@@ -83,11 +71,7 @@ function toggleLegendStatus(status, element = null) {
         const legend = document.querySelector('.legend');
         const items = legend.querySelectorAll('.legend-item');
         items.forEach(item => {
-            const label = item.querySelector('.legend-label').textContent;
-            if ((status === 'verde' && label.includes('Roteirizado (Atendido)')) ||
-                (status === 'laranja' && label.includes('Não Roteirizado (Com Venda)')) ||
-                (status === 'vermelho' && label.includes('Roteirizado (Sem Venda)')) ||
-                (status === 'cinza' && label.includes('Não Roteirizado (Sem Venda)'))) {
+            if (getLegendItemStatus(item) === status) {
                 element = item;
             }
         });
@@ -166,18 +150,7 @@ function updateLegendVisuals() {
 
     const items = legend.querySelectorAll('.legend-item');
     items.forEach(item => {
-        const label = item.querySelector('.legend-label').textContent;
-        let status = '';
-
-        if (label.includes('Roteirizado (Atendido)')) {
-            status = 'verde';
-        } else if (label.includes('Não Roteirizado (Com Venda)')) {
-            status = 'laranja';
-        } else if (label.includes('Roteirizado (Sem Venda)')) {
-            status = 'vermelho';
-        } else if (label.includes('Não Roteirizado (Sem Venda)')) {
-            status = 'cinza';
-        }
+        const status = getLegendItemStatus(item);
 
         if (status) {
             if (legendState[status]) {
@@ -190,7 +163,7 @@ function updateLegendVisuals() {
 }
 
 /**
- * Obtém estado da legenda
+ * ObtÃ©m estado da legenda
  * @returns {Object} - Estado de cada status
  */
 function getLegendState() {
@@ -212,8 +185,8 @@ function setLegendState(state) {
 }
 
 function addLegendControls() {
-    // Função preservada para compatibilidade com o chamador principal.
-    // Os botões já estão criados no HTML e seus controles foram movidos para o main.js.
+    // FunÃ§Ã£o preservada para compatibilidade com o chamador principal.
+    // Os botÃµes jÃ¡ estÃ£o criados no HTML e seus controles foram movidos para o main.js.
 }
 
 /**
@@ -224,9 +197,9 @@ function addLegendControls() {
 function getLegendTooltip(status) {
     const tooltips = {
         'verde': 'Clique para mostrar/ocultar lojas roteirizadas e atendidas',
-        'laranja': 'Clique para mostrar/ocultar lojas não roteirizadas com venda',
+        'laranja': 'Clique para mostrar/ocultar lojas nÃ£o roteirizadas com venda',
         'vermelho': 'Clique para mostrar/ocultar lojas roteirizadas sem venda',
-        'cinza': 'Clique para mostrar/ocultar lojas não roteirizadas sem venda'
+        'cinza': 'Clique para mostrar/ocultar lojas nÃ£o roteirizadas sem venda'
     };
 
     return tooltips[status] || '';
@@ -236,13 +209,13 @@ function getLegendTooltip(status) {
  * Atualiza contadores na legenda
  */
 function updateLegendCounts() {
-    const stats = getLojaStats();
+    const stats = getLegendScopedStats();
     // O total exibido na tela deve refletir as lojas filtradas se houver filtro ativo
     const totalElement = document.getElementById('totalLojas');
     if (totalElement) {
-        // O total principal acompanha a visao atual do usuario, enquanto
-        // os contadores por status continuam usando a base carregada.
-        const currentCount = (typeof filteredLojas !== 'undefined' && filteredLojas.length > 0 && filteredLojas.length !== getLojas().length) ? filteredLojas.length : getLojas().length;
+        const currentCount = hasAnyVisibleFilterApplied()
+            ? (Array.isArray(filteredLojas) ? filteredLojas.length : 0)
+            : getLojas().length;
         totalElement.textContent = currentCount;
     }
 
@@ -252,30 +225,64 @@ function updateLegendCounts() {
     const items = legend.querySelectorAll('.legend-item');
     items.forEach(item => {
         const label = item.querySelector('.legend-label');
-        let status = '';
-        let count = 0;
+        const status = getLegendItemStatus(item);
+        const count = status ? (stats.porStatus[status] || 0) : 0;
 
-        if (label.textContent.includes('Roteirizado (Atendido)')) {
-            status = 'verde';
-            count = stats.porStatus.verde;
-        } else if (label.textContent.includes('Não Roteirizado (Com Venda)')) {
-            status = 'laranja';
-            count = stats.porStatus.laranja;
-        } else if (label.textContent.includes('Roteirizado (Sem Venda)')) {
-            status = 'vermelho';
-            count = stats.porStatus.vermelho;
-        } else if (label.textContent.includes('Não Roteirizado (Sem Venda)')) {
-            status = 'cinza';
-            count = stats.porStatus.cinza;
-        }
-
-        if (status) {
-            // Adicionar contador ao label
+        if (status && label) {
             const labelText = label.dataset.baseLabel || label.textContent.trim();
             label.textContent = `${labelText} (${count})`;
             label.title = getLegendTooltip(status);
         }
     });
+}
+
+function getLegendScopedStats() {
+    const source = (typeof getFilteredLojas === 'function')
+        ? getFilteredLojas(getLojas() || [], { includeStatus: false, includeTextFilters: true, includeQuickQuery: true })
+        : (getLojas() || []);
+
+    const stats = {
+        total: source.length,
+        porStatus: {
+            verde: 0,
+            laranja: 0,
+            vermelho: 0,
+            cinza: 0
+        }
+    };
+
+    source.forEach(loja => {
+        const key = typeof normalizeStatus === 'function'
+            ? normalizeStatus(loja.statusCor)
+            : (loja.statusCor || '').toString().toLowerCase();
+        if (stats.porStatus[key] === undefined) stats.porStatus[key] = 0;
+        stats.porStatus[key]++;
+    });
+
+    return stats;
+}
+
+function hasAnyVisibleFilterApplied() {
+    const legendHasHiddenStatus = Object.values(legendState).some(value => value === false);
+    const structuredFilters = typeof hasActiveNonStatusFilters === 'function' ? hasActiveNonStatusFilters() : false;
+    return legendHasHiddenStatus || structuredFilters;
+}
+
+function getLegendItemStatus(element) {
+    if (!element) return '';
+
+    const dataStatus = (element.dataset.status || '').toString().trim().toLowerCase();
+    if (dataStatus) return dataStatus;
+
+    const label = element.querySelector('.legend-label');
+    const text = label ? (label.dataset.baseLabel || label.textContent || '').trim() : '';
+
+    if (text === 'Roteirizado (Atendido)') return 'verde';
+    if (text === 'Não Roteirizado (Com Venda)' || text === 'NÃ£o Roteirizado (Com Venda)') return 'laranja';
+    if (text === 'Roteirizado (Sem Venda)') return 'vermelho';
+    if (text === 'Não Roteirizado (Sem Venda)' || text === 'NÃ£o Roteirizado (Sem Venda)') return 'cinza';
+
+    return '';
 }
 
 /**
@@ -308,7 +315,7 @@ function toggleLegendPanel() {
     if (legend) {
         legend.classList.toggle('collapsed');
         log('Painel de legenda alternado', 'log');
-        // Opcional: ajustar mapa se necessário pelo redimensionamento
+        // Opcional: ajustar mapa se necessÃ¡rio pelo redimensionamento
         if (typeof mapInstance !== 'undefined' && mapInstance) {
             setTimeout(() => {
                 mapInstance.invalidateSize();
@@ -333,4 +340,6 @@ function closeLegendPanel() {
     }
 }
 
-console.log('✓ legend-manager.js carregado com sucesso');
+console.log('âœ“ legend-manager.js carregado com sucesso');
+
+

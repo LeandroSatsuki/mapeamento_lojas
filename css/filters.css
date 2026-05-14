@@ -87,6 +87,10 @@
     margin-bottom: 0;
 }
 
+.filter-group-toggle-header {
+    align-items: center;
+}
+
 .filter-hint {
     margin-bottom: var(--spacing-sm);
     font-size: var(--font-size-sm);
@@ -97,6 +101,10 @@
     content: "Nenhuma opção disponível";
     font-size: var(--font-size-sm);
     color: var(--color-texto-secundario);
+}
+
+#filterUFsWrapper.is-collapsed {
+    display: none;
 }
 
 /* Inputs de Filtro */
@@ -175,6 +183,22 @@
 
 .btn-filter-action.btn-filter-secondary:hover {
     background: #e9ecef;
+}
+
+.btn-filter-toggle {
+    padding: 4px 10px;
+    background: transparent;
+    color: var(--color-texto-secundario);
+    border: 1px solid var(--color-borda);
+    border-radius: 999px;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-filter-toggle:hover {
+    color: var(--color-texto-principal);
+    background: var(--color-fundo);
 }
 
 .btn-filter-action:active {

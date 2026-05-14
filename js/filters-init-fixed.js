@@ -41,6 +41,7 @@ function initializeFilters() {
 
         setupTextFilterListeners();
         setupButtonListeners();
+        setupUFSectionToggle();
 
         log('Filtros inicializados com sucesso', 'log');
     } catch (error) {
@@ -245,6 +246,18 @@ function setupButtonListeners() {
     if (legendHideAll) {
         legendHideAll.addEventListener('click', deactivateAllLegendStatus);
     }
+}
+
+function setupUFSectionToggle() {
+    const toggleBtn = document.getElementById('toggleUFsBtn');
+    const wrapper = document.getElementById('filterUFsWrapper');
+    if (!toggleBtn || !wrapper) return;
+
+    toggleBtn.addEventListener('click', function () {
+        const collapsed = wrapper.classList.toggle('is-collapsed');
+        toggleBtn.textContent = collapsed ? 'Expandir' : 'Recolher';
+        toggleBtn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    });
 }
 
 /**
