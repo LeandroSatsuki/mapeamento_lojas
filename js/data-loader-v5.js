@@ -272,13 +272,10 @@ function processLojas(rawData) {
     let validCount = 0;
     let invalidCount = 0;
     const invalidReasons = { coords: 0, incomplete: 0, parseError: 0 };
-    const invalidSamples = [];
 
     // Detectar campo de logo (coluna P). Procurar header com palavras-chave ou usar a 16ª coluna se necessário
     const rawHeaders = Object.keys(rawData[0] || {});
     const trimmedHeaders = rawHeaders.map(h => h.trim());
-    console.log('CSV headers (raw):', rawHeaders);
-    console.log('CSV headers (trimmed):', trimmedHeaders);
     let logoHeader = null;
     for (const h of trimmedHeaders) {
         if (/logo|logomarca|imagem|image|nome.*logo/i.test(h)) {
@@ -289,7 +286,6 @@ function processLojas(rawData) {
     if (logoHeader === null && trimmedHeaders.length >= 16) {
         logoHeader = trimmedHeaders[15]; // coluna P
     }
-    console.log('Logo header detectado (coluna P candidate):', JSON.stringify(logoHeader));
 
     rawData.forEach((row, index) => {
         try {
@@ -313,12 +309,6 @@ function processLojas(rawData) {
             const lng = parseFloat(longitude.toString().replace(',', '.'));
 
             log(`Loja ${index + 1}: Latitude original="${latitude}" → ${lat}, Longitude original="${longitude}" → ${lng}`, 'log');
-
-            // DEBUG: Log EXTREMAMENTE detalhado
-            console.log('LOJA ' + (index + 1) + ' - TODAS AS COLUNAS:');
-            console.log(normalizedRow);
-            console.log('Status encontrado:', normalizedRow['Status']);
-            console.log('Status de Cor encontrado:', normalizedRow['Status de Cor']);
 
             // Obter valor bruto da coluna P por nome (caso-insensitivo) ou por índice como fallback
             // A logo pode vir nomeada explicitamente ou cair apenas na
@@ -368,7 +358,6 @@ function processLojas(rawData) {
                 latitude: lat,
                 longitude: lng
             };
-            console.log(`Loja processada [${loja.id}] "${loja.nomeFantasia}" → logo field value:`, loja.logo);
 
             // Validar coordenadas
             // So mantemos lojas realmente posicionaveis no mapa para evitar
@@ -377,7 +366,6 @@ function processLojas(rawData) {
                 log(`Loja ${loja.id} com coordenadas inválidas (${loja.latitude}, ${loja.longitude})`, 'warn');
                 invalidCount++;
                 invalidReasons.coords++;
-                if (invalidSamples.length < 10) invalidSamples.push({ index: index + 1, id: loja.id, nome: loja.nomeFantasia, reason: 'coords', latitude: loja.latitude, longitude: loja.longitude });
                 return;
             }
 
@@ -386,7 +374,6 @@ function processLojas(rawData) {
                 log(`Loja ${loja.id} com dados incompletos`, 'warn');
                 invalidCount++;
                 invalidReasons.incomplete++;
-                if (invalidSamples.length < 10) invalidSamples.push({ index: index + 1, id: loja.id, nome: loja.nomeFantasia, reason: 'incomplete', cidade: loja.cidade, uf: loja.uf });
                 return;
             }
 
@@ -396,13 +383,11 @@ function processLojas(rawData) {
             log(`Erro ao processar loja na linha ${index + 1}: ${error.message}`, 'warn');
             invalidCount++;
             invalidReasons.parseError++;
-            if (invalidSamples.length < 10) invalidSamples.push({ index: index + 1, reason: 'parseError', error: error.message, raw: row });
         }
     });
 
     log(`Processamento concluído: ${validCount} válidas, ${invalidCount} inválidas`, 'log');
     log(`Motivos: coords=${invalidReasons.coords}, incomplete=${invalidReasons.incomplete}, parseError=${invalidReasons.parseError}`, 'log');
-    console.log('Amostra de linhas inválidas (até 10):', invalidSamples);
     return processed;
 }
 

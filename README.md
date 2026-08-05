@@ -1,191 +1,127 @@
-# Mapeamento de Lojas - Preferenza
+# Mapeamento de Lojas — Preferenza
 
-Aplicacao web estatica para visualizacao geografica das lojas da Preferenza em mapa interativo, com filtros operacionais, legenda por status, agrupamento de marcadores e leitura de dados a partir de planilha publicada.
+<p align="center">
+  Aplicação web para transformar uma base operacional de lojas em uma visão geográfica interativa, filtrável e pronta para análise.
+</p>
 
-## Visao Geral
+<p align="center">
+  <img alt="JavaScript" src="https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black">
+  <img alt="Leaflet" src="https://img.shields.io/badge/Leaflet-199900?style=flat-square&logo=leaflet&logoColor=white">
+  <img alt="OpenStreetMap" src="https://img.shields.io/badge/OpenStreetMap-7EBC6F?style=flat-square&logo=openstreetmap&logoColor=white">
+  <img alt="Turf.js" src="https://img.shields.io/badge/Turf.js-2ECC71?style=flat-square">
+</p>
 
-O projeto foi organizado para uso direto em hospedagem estatica. O mapa carrega os dados da planilha configurada em `data/config.json`, exibe as lojas no Leaflet e permite filtrar rapidamente por:
+## Sobre o projeto
 
-- UF
-- Regiao
-- busca textual
-- status pela legenda
+O Mapeamento de Lojas foi criado para facilitar a leitura da cobertura operacional da Preferenza. A aplicação consome uma base publicada no Google Sheets, normaliza os registros e posiciona as lojas em um mapa com filtros, indicadores visuais e agrupamento inteligente de marcadores.
 
-Tambem existem areas dinamicas por regiao, popups com link para Google Maps e logos customizadas por rede.
+Por ser uma aplicação estática, pode ser publicada em hospedagens simples sem backend próprio. A arquitetura modular separa carregamento de dados, filtros, marcadores, regiões, popups e legenda, facilitando manutenção e evolução.
 
-## Stack
+## Problemas resolvidos
 
-- HTML5
-- CSS3
-- JavaScript vanilla
-- Leaflet
-- Leaflet MarkerCluster
-- Turf.js
+- visualização geográfica de uma base que antes era consultada apenas como tabela;
+- identificação rápida de lojas por status operacional;
+- redução da poluição visual com clusters de marcadores;
+- combinação de filtros por estado, região, texto e status;
+- atualização dos dados sem necessidade de republicar o site;
+- exportação do recorte filtrado para novas análises;
+- acesso direto à localização da loja pelo Google Maps.
 
-## Estrutura
+## Funcionalidades
+
+- mapa responsivo com zoom e navegação;
+- leitura de dados publicados no Google Sheets;
+- normalização de campos e validação de coordenadas;
+- clusters configuráveis para grandes concentrações de lojas;
+- marcadores personalizados com logos das redes;
+- filtros em cascata por UF e região;
+- busca por loja, CNPJ, cidade, rede e outros campos;
+- legenda interativa com contadores por status;
+- áreas regionais calculadas dinamicamente com Turf.js;
+- popups com informações e link de navegação;
+- cache local com atualização manual da fonte;
+- exportação CSV dos resultados filtrados.
+
+## Arquitetura
 
 ```text
-.
-|-- index.html
-|-- css/
-|   |-- filters.css
-|   |-- responsive.css
-|   `-- style.css
-|-- data/
-|   `-- config.json
-|-- images/
-|   `-- logos/
-|-- js/
-|   |-- cluster-manager.js
-|   |-- data-loader-v5.js
-|   |-- filter-manager-fixed.js
-|   |-- filters-init-fixed.js
-|   |-- legend-manager.js
-|   |-- main.js
-|   |-- map-config.js
-|   |-- marker-manager-gota-v2.js
-|   |-- popup-handler.js
-|   |-- region-layer-manager.js
-|   `-- utils-fixed.js
-`-- scripts/
-    |-- deploy-ftp.ps1
-    |-- ftp-deploy.config.example.json
-    `-- static-server.ps1
+Google Sheets (CSV publicado)
+            │
+            ▼
+ carregamento e normalização
+            │
+      ┌─────┴─────┐
+      ▼           ▼
+ filtros       regiões
+      │           │
+      └─────┬─────┘
+            ▼
+ Leaflet + MarkerCluster
+            │
+            ▼
+ mapa, legenda e exportação
 ```
 
-## Funcionalidades Atuais
+| Componente | Responsabilidade |
+| --- | --- |
+| `js/main.js` | Inicialização e coordenação da aplicação |
+| `js/data-loader-v5.js` | Leitura, normalização, validação e cache dos dados |
+| `js/filter-manager-fixed.js` | Estado e aplicação dos filtros |
+| `js/marker-manager-gota-v2.js` | Criação e atualização dos marcadores |
+| `js/region-layer-manager.js` | Geração das áreas geográficas por região |
+| `js/legend-manager.js` | Legenda, status e contadores |
+| `data/config.json` | Fonte de dados, mapa, cores, logos e desempenho |
 
-- mapa interativo com zoom e arraste
-- clusterizacao de marcadores para reduzir custo de renderizacao
-- marcadores customizados com logos das redes
-- legenda interativa com ativacao e ocultacao por status
-- contadores da legenda sincronizados com os filtros ativos
-- filtros em cascata por UF e Regiao
-- busca rapida por loja, CNPJ, cidade, regiao, rede e outros campos
-- areas de regiao desenhadas dinamicamente a partir dos pontos
-- popup com dados da loja e link para abrir no Google Maps
-- exportacao CSV das lojas filtradas
+## Executar localmente
 
-## Status e Cores
+O projeto não exige instalação de dependências.
 
-| Status | Cor |
-|---|---|
-| Roteirizado (Atendido) | Verde |
-| Roteirizado (Sem Venda) | Vermelho |
-| Nao Roteirizado (Com Venda) | Laranja |
-| Nao Roteirizado (Sem Venda) | Cinza escuro |
-
-## Origem dos Dados
-
-Os dados sao lidos da planilha configurada em `data/config.json`.
-
-Campos usados no fluxo atual:
-
-- id
-- cnpj
-- statusCor
-- nomeFantasia
-- supervisor
-- logradouro
-- numero
-- bairro
-- cidade
-- uf
-- latitude
-- longitude
-- regiao
-- rede
-
-## Como Rodar Localmente
-
-### Opcao 1: servidor local ja incluido
+### Windows
 
 ```powershell
 .\scripts\static-server.ps1
 ```
 
-Depois abra:
+Depois, acesse `http://localhost:8000`.
 
-```text
-http://localhost:8000/
+### Python
+
+```bash
+python -m http.server 8000
 ```
 
-### Opcao 2: qualquer servidor estatico
+> Utilize um servidor HTTP. A leitura da configuração e dos dados não funciona corretamente ao abrir `index.html` diretamente pelo sistema de arquivos.
 
-Basta servir a raiz do projeto sem processamento adicional.
+## Configuração
 
-## Publicacao por FTP
+O arquivo `data/config.json` controla a fonte da planilha, posição do mapa, status, logos, clusters e duração do cache.
 
-O projeto possui script de deploy para hospedagem estatica via FTP.
+A planilha precisa permitir leitura pública do CSV. Não publique informações pessoais, credenciais ou dados que não devam ficar acessíveis pela internet.
 
-### Arquivos
+## Publicação
 
-- exemplo de config: `scripts/ftp-deploy.config.example.json`
-- script de deploy: `scripts/deploy-ftp.ps1`
-
-### Preparacao
-
-Copie o arquivo de exemplo e preencha seus acessos:
-
-```text
-scripts/ftp-deploy.config.json
-```
-
-Campos principais:
-
-- `server`
-- `username`
-- `password`
-- `remotePath`
-- `useSsl`
-- `passiveMode`
-
-### Teste de publicacao
+O projeto inclui um fluxo opcional de publicação por FTP:
 
 ```powershell
+Copy-Item .\scripts\ftp-deploy.config.example.json .\scripts\ftp-deploy.config.json
 .\scripts\deploy-ftp.ps1 -DryRun
 ```
 
-### Publicacao real
+O arquivo real de configuração deve permanecer fora do Git. Depois de validar o destino, execute o script sem `-DryRun`.
 
-```powershell
-.\scripts\deploy-ftp.ps1
-```
+## Documentação
 
-O deploy publica:
+- [Guia rápido](./docs/GUIA_RAPIDO.md)
+- [Guia para VS Code](./docs/GUIA_VSCODE.md)
 
-- `index.html`
-- `css/`
-- `js/`
-- `data/`
-- `images/`
+## Segurança e privacidade
 
-## Manutencao de Logos
+- a aplicação é totalmente executada no navegador;
+- a URL da planilha publicada fica visível para qualquer visitante;
+- somente dados autorizados para acesso público devem alimentar o mapa;
+- credenciais de FTP não devem ser versionadas;
+- os logs não exibem o conteúdo integral das linhas carregadas.
 
-As logos ficam em `images/logos/`.
+## Autor e contexto
 
-Recomendacoes:
-
-- manter nomes consistentes com o mapeamento usado no JS
-- preferir PNG com fundo transparente
-- evitar arquivos muito pesados quando a logo aparece em muitos marcadores
-
-## Arquivos Principais
-
-- `js/main.js`: bootstrap geral da aplicacao
-- `js/data-loader-v5.js`: leitura, normalizacao e atualizacao dos dados
-- `js/filter-manager-fixed.js`: estado central de filtros
-- `js/legend-manager.js`: comportamento da legenda e contadores
-- `js/marker-manager-gota-v2.js`: criacao e atualizacao dos marcadores
-- `js/region-layer-manager.js`: desenho das areas de regiao
-- `js/utils-fixed.js`: utilitarios compartilhados
-
-## Observacoes Importantes
-
-- o projeto e estatico; nao depende de backend proprio
-- a qualidade da experiencia depende diretamente da planilha publicada e das logos disponiveis
-- o `.gitignore` foi preparado para evitar versionar credenciais de deploy
-
-## Estado Atual
-
-Projeto limpo, publicado e com deploy FTP automatizado.
+Projeto desenvolvido para a operação da **Preferenza** por [Leandro Santos](https://github.com/LeandroSatsuki).
